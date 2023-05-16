@@ -16,6 +16,7 @@ try:
     # from Const.Logger
     import numpy as np
     from werkzeug.utils import secure_filename
+    
 except Exception as e:
     from Config.Logger import Logger
     logger = Logger()
@@ -33,13 +34,14 @@ class readImage(Resource):
         
         # Read the image using OpenCV
         image_array = np.frombuffer(image_file.read(), np.uint8)
-        image = cv.imdecode(image_array, cv.IMREAD_COLOR)
-        image = ocr.sharpen_image(image)
+        image_A = cv.imdecode(image_array, cv.IMREAD_COLOR)
+        image_b = ocr.sharpen_image(image_A)
         # Display the image
-        # cv.imshow('image_a', image_a)
+        # cv.imshow('image_a', image_A)
+        # cv.imshow('image_B', image_b)
         # cv.waitKey(0)
         # cv.destroyAllWindows()
-        ocr.store_image(image)
+        ocr.store_image(image_b)
         ocr.read_image()
         
 

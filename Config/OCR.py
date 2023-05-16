@@ -15,99 +15,61 @@ class OCR:
 
     def sharpen_image(self, image):
         # gray_img = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        blurred = cv.GaussianBlur(image, (3, 3), 1)
-        sharpened = cv.addWeighted(image, 1.5, blurred, -0.5, 0)
-        return sharpened
+        # blurred = cv.GaussianBlur(gray_img, (3, 3), 1)
+        blurred_1 = cv.GaussianBlur(image, (0, 0), 3)
+        sharpened_1 = cv.addWeighted(image, 1.1, blurred_1, -0.6, 40)
+        # sharpened = cv.subtract(gray_img, blurred)
+        # result = cv.addWeighted(image, 1.5, cv.cvtColor(sharpened, cv.COLOR_GRAY2BGR), -0.5, 0)
+        # gray_img = cv.cvtColor(sharpened, cv.COLOR_BGR2GRAY)
+        return sharpened_1
 
     def store_image(self, image):
         if os.path.exists(self.image_path):
             os.remove(self.image_path)
         print("Writing to file in progress......")
         cv.imwrite(self.image_path, image)
-        # if os.path.exists(IMAGE_FOLDER + IMAGE_NAME + image_name):
-        #     os.remove(IMAGE_FOLDER + IMAGE_NAME + image_name)
     
     def read_image(self):
-        # img = cv.imread(self.image_path)
-        # # blur_image = cv.GaussianBlur(img, (3,3), 0)
-        # blur_image = self.sharpen_image(img)
-        # resize_img = cv.resize(blur_image, (1200,1800))
-        # gray = cv.cvtColor(resize_img, cv.COLOR_BGR2GRAY)
-
-        # # Apply the Laplacian filter
-        # laplacian = cv.Laplacian(gray, cv.CV_64F)
-
-        # # Normalize the result to make it a valid image format
-        # laplacian = np.uint8(np.absolute(laplacian))
-
-        # # Combine the original image with the sharpened result
-        # sharpened = cv.bitwise_or(resize_img, cv.cvtColor(laplacian, cv.COLOR_GRAY2BGR))
+        # Load the image
         img = cv.imread(self.image_path)
-        
-        # Resize the image for better processing speed (optional)
-        resized_image = cv.resize(img, None, fx=0.5, fy=0.5)
-
-        # Convert the image to grayscale
-        gray = cv.cvtColor(resized_image, cv.COLOR_BGR2GRAY)
+        # img = self.sharpen_image(img)
 
         # Apply Gaussian blur to reduce noise (optional)
-        # blur_image = cv.GaussianBlur(img, (3, 3), 0)
+        blur_image = cv.GaussianBlur(img, (3, 3), 3)
 
         # Convert the image to grayscale
-        # gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-        # # Apply the Laplacian filter
-        # laplacian = cv.Laplacian(gray, cv.CV_64F)
-
-        # # Normalize the result to make it a valid image format
-        # laplacian = np.uint8(np.absolute(laplacian))
-
-        # # Convert the grayscale image to BGR
-        # gray_bgr = cv.cvtColor(gray, cv.COLOR_GRAY2BGR)
-
-        # # Combine the original image with the sharpened result
-        # sharpened = cv.bitwise_or(img, gray_bgr)
-
-        # # Resize the final sharpened image
-        # resize_img = cv.resize(sharpened, (1200, 1800))
+        gray = cv.cvtColor(blur_image, cv.COLOR_BGR2GRAY)
         
-        
-        ## Good ##
-        # Convert the image to grayscale
-        # gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        binary = cv.adaptiveThreshold(gray, 0, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 15, 5)
 
-        # Apply Gaussian blur to the grayscale image
-        # blurred = cv.GaussianBlur(gray, (0, 0), 3)
+        # Apply image sharpening to the binary image
+        kernel = np.array([[1, -1, 0], [-1, 5, -1], [0, -1, 5]], dtype=np.float32)
+        sharpened = cv.filter2D(binary, -1, kernel)
 
-        # Combine the masked image and the paper texture overlay
-        # scanned_copy = cv.add(masked_image, papered_resized)
-        
         # Merge the sharpened image with the original image
-        # result = cv.addWeighted(img, 1.2, cv.cvtColor(sharpened, cv.COLOR_GRAY2BGR), -1.2, 2)
+        result = cv.bitwise_or(img, cv.cvtColor(sharpened, cv.COLOR_GRAY2BGR))
+        # kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
     
-        res = self.sharpen_image(gray)
-        # cv.imshow('result1', res)
-        # cv.imshow('img', img)
-        # cv.waitKey(0)
-        # cv.destroyAllWindows()
+        # # Apply the sharpening filter
+        # sharpened_image = cv.filter2D(resize_img, -1, kernel)
+        res = self.sharpen_image(result)
+        cv.imshow('resize_img', result)
+        cv.imshow('res', res)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
         
-        
-        
-        print("OCR working.....")
-        result = self.ocr.ocr(res)
-        print(result)
-        for line in result[0]:
-        
-            text = line[1][0]
-            bbox = line[0]
-            print(line[1])
-        # result = self.table_engine(img)
-        # for line in result:
-        #     line.pop('img')
+        # print("OCR working.....")
         # li = []
-        # for i in result[0]['res']:
-        #     li.append(i)
+        # result = self.ocr.ocr(res)
+        # for line in result[0]:
+        #     text = line[1][0]
+        #     bbox = line[0]
+        #     li.append(text)
         
-        # for i in li:
-        #     print(i['text'])
+        # registration_no = li[8]
+        # chassis_No = li[9]
+        # current_owner_address = li[12] + " " + li[13]
+        # condition_special_notes = li[15]
+        # print(li)
+        # absolute_owner = li[]
         

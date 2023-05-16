@@ -35,13 +35,13 @@ class readImage(Resource):
         # Read the image using OpenCV
         image_array = np.frombuffer(image_file.read(), np.uint8)
         image_A = cv.imdecode(image_array, cv.IMREAD_COLOR)
-        image_b = ocr.sharpen_image(image_A)
+        # image_b = ocr.sharpen_image(image_A)
         # Display the image
         # cv.imshow('image_a', image_A)
         # cv.imshow('image_B', image_b)
         # cv.waitKey(0)
         # cv.destroyAllWindows()
-        ocr.store_image(image_b)
+        ocr.store_image(image_A)
         ocr.read_image()
         
 
